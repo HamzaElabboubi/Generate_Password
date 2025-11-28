@@ -1,52 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generate_password</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Secure Password Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        h1 span {
+            color: #2575fc;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .display {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-bottom: 30px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .display:focus-within {
+            border-color: #2575fc;
+            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+        }
+
+        #password {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 18px;
+            padding: 10px 0;
+            color: #333;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .copy-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .options {
+            text-align: left;
+            margin-bottom: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .option {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .option label {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .length-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .length-control label {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .length-control input {
+            width: 60px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .strength-meter {
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .strength-text {
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: right;
+            color: #666;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Generate a <br><span>Random Password</span></h1>
+
         <div class="display">
-            <input type="text " id="password" placeholder="Password">
-            <img src="1.png" alt="copy" onclick="copyPassword()"  >
+            <input type="text" id="password" placeholder="Your password will appear here" readonly>
+            <button class="copy-btn" onclick="copyPassword()">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3Qgd2lkdGg9IjE0IiBoZWlnaHQ9IjE0IiB4PSI4IiB5PSI4IiByeD0iMiIgcnk9IjIiPjwvcmVjdD48cGF0aCBkPSJNMTYgOHYtMmE0IDQgMCAwIDAtNC00aC01YTQgNCAwIDAgMC00IDR2MTJhNCA0IDAgMCAwIDQgNGg1YTQgNCAwIDAgMCA0LTR2LTIiPjwvcGF0aD48L3N2Zz4="
+                    alt="Copy">
+            </button>
         </div>
-        <button onclick="createpassword()"><img src="2.png">Generate Password</button>
+
+        <div class="strength-meter">
+            <div class="strength-fill" id="strengthFill"></div>
+        </div>
+        <div class="strength-text" id="strengthText">Password strength: -</div>
+
+        <div class="options">
+            <div class="length-control">
+                <label for="length">Password Length:</label>
+                <input type="number" id="length" min="4" max="50" value="12">
+            </div>
+
+            <div class="option">
+                <input type="checkbox" id="uppercase" checked>
+                <label for="uppercase">Include Uppercase Letters (A-Z)</label>
+            </div>
+
+            <div class="option">
+                <input type="checkbox" id="lowercase" checked>
+                <label for="lowercase">Include Lowercase Letters (a-z)</label>
+            </div>
+
+            <div class="option">
+                <input type="checkbox" id="numbers" checked>
+                <label for="numbers">Include Numbers (0-9)</label>
+            </div>
+
+            <div class="option">
+                <input type="checkbox" id="symbols" checked>
+                <label for="symbols">Include Symbols (!@#$% etc.)</label>
+            </div>
+        </div>
+
+        <button onclick="createPassword()">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTEyIDF2OG0wIDB2OG0wLThINmE1IDUgMCAwIDEgNS01bTUtNWExMCAxMCAwIDAgMS0xMCAxMCI+PC9wYXRoPjwvc3ZnPg=="
+                alt="Generate">
+            Generate Password
+        </button>
     </div>
+
+    <div class="notification" id="notification">Password copied to clipboard!</div>
+
     <script>
-    const passwordBox= document.getElementById("password");
-    const leght= 12;
-    const uppercase = "ABCDEFJHIGKLMKNOPRSTUVWXYZ";
-    const lowercase = "abcdefjhigklmnopqrstuvwxyz";
-    const number = "0123456789";
-    const symbol = "@!#$%^&*()_+=?/<>{}[]"; 
-    
-    const allcharts = uppercase + lowercase + number + symbol;
+        const passwordBox = document.getElementById("password");
+        const lengthInput = document.getElementById("length");
+        const uppercaseCheckbox = document.getElementById("uppercase");
+        const lowercaseCheckbox = document.getElementById("lowercase");
+        const numbersCheckbox = document.getElementById("numbers");
+        const symbolsCheckbox = document.getElementById("symbols");
+        const strengthFill = document.getElementById("strengthFill");
+        const strengthText = document.getElementById("strengthText");
+        const notification = document.getElementById("notification");
 
-    function createpassword(){    
-        let password ="";
-       /* password += uppercase[Math.floor(Math.random() * uppercase.length)];
-        password += lowercase[Math.floor(Math.random() * lowercase.length)];
-        password += number[Math.floor(Math.random() * number.length)];
-        password += symbol[Math.floor(Math.random() * symbol.length)];*/
+        const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const lowercase = "abcdefghijklmnopqrstuvwxyz";
+        const numbers = "0123456789";
+        const symbols = "@!#$%^&*()_+=?/<>{}[]";
 
-        while(leght > password.length ){
-           password += allcharts[Math.floor(Math.random() * allcharts.length)];
+        function createPassword() {
+            const length = parseInt(lengthInput.value);
+            const includeUppercase = uppercaseCheckbox.checked;
+            const includeLowercase = lowercaseCheckbox.checked;
+            const includeNumbers = numbersCheckbox.checked;
+            const includeSymbols = symbolsCheckbox.checked;
+
+            // Validate at least one character type is selected
+            if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSymbols) {
+                showNotification("Please select at least one character type", "error");
+                return;
+            }
+
+            // Build character set based on selected options
+            let characterSet = "";
+            if (includeUppercase) characterSet += uppercase;
+            if (includeLowercase) characterSet += lowercase;
+            if (includeNumbers) characterSet += numbers;
+            if (includeSymbols) characterSet += symbols;
+
+            // Generate password ensuring at least one character from each selected type
+            let password = "";
+
+            // Add at least one character from each selected type
+            if (includeUppercase) {
+                password += uppercase[Math.floor(Math.random() * uppercase.length)];
+            }
+            if (includeLowercase) {
+                password += lowercase[Math.floor(Math.random() * lowercase.length)];
+            }
+            if (includeNumbers) {
+                password += numbers[Math.floor(Math.random() * numbers.length)];
+            }
+            if (includeSymbols) {
+                password += symbols[Math.floor(Math.random() * symbols.length)];
+            }
+
+            // Fill the rest of the password with random characters from the full set
+            while (password.length < length) {
+                password += characterSet[Math.floor(Math.random() * characterSet.length)];
+            }
+
+            // Shuffle the password to mix the guaranteed characters
+            password = shuffleString(password);
+
+            passwordBox.value = password;
+            updatePasswordStrength(password);
         }
-        passwordBox.value = password;
-    }
 
-    function copyPassword(){
-        passwordBox.select()
-        document.execCommand("copy");
-    }
+        function shuffleString(string) {
+            const array = string.split('');
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array.join('');
+        }
 
-   
+        function copyPassword() {
+            if (!passwordBox.value) {
+                showNotification("Generate a password first", "error");
+                return;
+            }
 
-   
+            passwordBox.select();
+            passwordBox.setSelectionRange(0, 99999); // For mobile devices
 
+            try {
+                navigator.clipboard.writeText(passwordBox.value).then(() => {
+                    showNotification("Password copied to clipboard!");
+                });
+            } catch (err) {
+                // Fallback for older browsers
+                document.execCommand("copy");
+                showNotification("Password copied to clipboard!");
+            }
+        }
+
+        function updatePasswordStrength(password) {
+            let strength = 0;
+            let feedback = "";
+
+            // Length check
+            if (password.length >= 12) strength += 2;
+            else if (password.length >= 8) strength += 1;
+
+            // Character variety checks
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[a-z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+
+            // Determine strength level
+            let strengthPercent = 0;
+            if (strength <= 2) {
+                feedback = "Very Weak";
+                strengthPercent = 25;
+                strengthFill.style.background = "#ff4d4d";
+            } else if (strength <= 4) {
+                feedback = "Weak";
+                strengthPercent = 50;
+                strengthFill.style.background = "#ffa64d";
+            } else if (strength <= 5) {
+                feedback = "Good";
+                strengthPercent = 75;
+                strengthFill.style.background = "#4d94ff";
+            } else {
+                feedback = "Strong";
+                strengthPercent = 100;
+                strengthFill.style.background = "#4CAF50";
+            }
+
+            strengthFill.style.width = `${strengthPercent}%`;
+            strengthText.textContent = `Password strength: ${feedback}`;
+        }
+
+        function showNotification(message, type = "success") {
+            notification.textContent = message;
+
+            if (type === "error") {
+                notification.style.background = "#ff4d4d";
+            } else {
+                notification.style.background = "#4CAF50";
+            }
+
+            notification.classList.add("show");
+
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+        }
+
+        // Generate a password on page load
+        window.onload = createPassword;
     </script>
 </body>
+
 </html>
